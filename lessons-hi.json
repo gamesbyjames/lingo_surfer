@@ -1,0 +1,31 @@
+{
+  "language": "hi",
+  "title": "A little Hindi. A lot to say.",
+  "pronunciationTip": "Capitals suggest gentle emphasis. aa, ee and oo are long vowels; don’t give Hindi a strong English stress.",
+  "pronunciationGuide": "Hindi in Roman letters. Capital vowels are gentle pronunciation cues, not fixed Greek-style stress marks. aa, ee and oo mark long vowels. In main, hoon and naheen, the final n signals a nasal vowel. kh, th and bh include a puff of breath; th is not the English sound in ‘think’. Choose masculine or feminine phrasing from the language menu. Listen to the recordings for the rhythm.",
+  "story": {
+    "id": "hi-story",
+    "english": "Yesterday I decided to learn Hindi. And today I can already speak a little Hindi.",
+    "roman": "kal main-ne hIndee sEEkhne kaa fAIslaa kiyaa. aur AAj main abhEE se thOdee hIndee bol sAktaa hoon.",
+    "native": "कल मैंने हिंदी सीखने का फ़ैसला किया। और आज मैं अभी से थोड़ी हिंदी बोल सकता हूँ।",
+    "forms": {"feminine": {"roman":"kal main-ne hIndee sEEkhne kaa fAIslaa kiyaa. aur AAj main abhEE se thOdee hIndee bol sAktee hoon.","native":"कल मैंने हिंदी सीखने का फ़ैसला किया। और आज मैं अभी से थोड़ी हिंदी बोल सकती हूँ।"}}
+  },
+  "phrases": [
+    {"id":"hi-yesterday","english":"Yesterday","roman":"kal","native":"कल","note":"Kal can mean yesterday or tomorrow. The past tense in our story tells you it means yesterday.","distractors":["AAj","abhEE"]},
+    {"id":"hi-decided","english":"I decided","roman":"main-ne fAIslaa kiyaa","native":"मैंने फ़ैसला किया।","distractors":["mujhe nahEEn patAA","mujhe hIndee pasAnd hai"]},
+    {"id":"hi-learn","english":"to learn Hindi","roman":"hIndee sEEkhnaa","native":"हिंदी सीखना","distractors":["angrEzee sEEkhnaa","hIndee bolnaa"]},
+    {"id":"hi-first-sentence","english":"Yesterday I decided to learn Hindi.","roman":"kal main-ne hIndee sEEkhne kaa fAIslaa kiyaa.","native":"कल मैंने हिंदी सीखने का फ़ैसला किया।","note":"In this sentence, seekhnaa changes to seekhne before kaa.","distractors":["AAj main-ne hIndee sEEkhne kaa fAIslaa kiyaa.","kal main-ne angrEzee sEEkhne kaa fAIslaa kiyaa."]},
+    {"id":"hi-today","english":"And today","roman":"aur AAj","native":"और आज","distractors":["aur kal","aur abhEE"]},
+    {"id":"hi-already","english":"Already (this soon)","roman":"abhEE se","native":"अभी से","note":"Abhee se conveys ‘already, at this early stage’ in our story.","distractors":["kal se","bAAd mein"]},
+    {"id":"hi-can-speak","english":"I can speak","roman":"main bol sAktaa hoon","native":"मैं बोल सकता हूँ।","note":"Saktaa is the masculine form; saktee is the feminine form. Change your sentence form in the language menu.","distractors":["main bol nahEEn sAktaa","main sEEkhnaa chAAhtaa hoon"],"forms":{"feminine":{"roman":"main bol sAktee hoon","native":"मैं बोल सकती हूँ।","distractors":["main bol nahEEn sAktee","main sEEkhnaa chAAhtee hoon"]}}},
+    {"id":"hi-a-little","english":"A little Hindi","roman":"thOdee hIndee","native":"थोड़ी हिंदी","distractors":["bahUt hIndee","thOdee angrEzee"]},
+    {"id":"hi-second-sentence","english":"And today I can already speak a little Hindi.","roman":"aur AAj main abhEE se thOdee hIndee bol sAktaa hoon.","native":"और आज मैं अभी से थोड़ी हिंदी बोल सकता हूँ।","distractors":["aur AAj main abhEE se bahUt hIndee bol sAktaa hoon.","aur AAj main abhEE se thOdee angrEzee bol sAktaa hoon."],"forms":{"feminine":{"roman":"aur AAj main abhEE se thOdee hIndee bol sAktee hoon.","native":"और आज मैं अभी से थोड़ी हिंदी बोल सकती हूँ।","distractors":["aur AAj main abhEE se bahUt hIndee bol sAktee hoon.","aur AAj main abhEE se thOdee angrEzee bol sAktee hoon."]}}},
+    {"id":"hi-want-learn","english":"I want to learn Hindi.","roman":"main hIndee sEEkhnaa chAAhtaa hoon.","native":"मैं हिंदी सीखना चाहता हूँ।","note":"Chaahtaa is masculine; chaahtee is feminine. The meaning is the same.","distractors":["main angrEzee sEEkhnaa chAAhtaa hoon.","main hIndee sEEkhnaa nahEEn chAAhtaa."],"forms":{"feminine":{"roman":"main hIndee sEEkhnaa chAAhtee hoon.","native":"मैं हिंदी सीखना चाहती हूँ।","distractors":["main angrEzee sEEkhnaa chAAhtee hoon.","main hIndee sEEkhnaa nahEEn chAAhtee."]}}},
+    {"id":"hi-like","english":"I like Hindi.","roman":"mujhe hIndee pasAnd hai.","native":"मुझे हिंदी पसंद है।","note":"This sentence works for all speakers.","distractors":["mujhe hIndee pasAnd nahEEn hai.","mujhe angrEzee pasAnd hai."]},
+    {"id":"hi-fantastic","english":"Fantastic! / Splendid!","roman":"shaandAAr!","native":"शानदार!","note":"A warm way to say something is splendid, excellent, or fantastic.","distractors":["burAA","mUshkil"]},
+    {"id":"hi-brilliant","english":"Brilliant! / Superb!","roman":"laajavAAb!","native":"लाजवाब!","note":"Literally ‘without an answer’—used for something superb or matchless.","distractors":["gAlat","thakAA huaa"]},
+    {"id":"hi-amazing","english":"Amazing! / Wonderful!","roman":"kamAAl!","native":"कमाल!","note":"An exclamation of admiration; also used for a marvel or a remarkable feat.","distractors":["AAm","mehEngaa"]},
+    {"id":"hi-awesome","english":"Awesome! / Terrific!","roman":"zabardAst!","native":"ज़बरदस्त!","note":"Enthusiastic praise; it can also mean powerful or tremendous.","distractors":["kamzOr","udAAs"]},
+    {"id":"hi-dont-know","english":"I don’t know.","roman":"mujhe nahEEn patAA.","native":"मुझे नहीं पता।","note":"A useful everyday phrase that works for all speakers.","distractors":["mujhe patAA hai.","mujhe hIndee pasAnd hai."]}
+  ]
+}

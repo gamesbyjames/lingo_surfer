@@ -1,4 +1,8 @@
 {
+  "language": "el",
+  "title": "The first little story.",
+  "pronunciationTip": "Capital vowels carry the emphasis: eh-TES, not EH-tes.",
+  "pronunciationGuide": "Greek in Roman letters. Say the capital vowels with emphasis. th sounds like ‘think’; dh like ‘this’; eh like the vowel in ‘bed’; h is a breathy sound, like the ‘ch’ in Scottish ‘loch’.",
   "story": {
     "id": "story",
     "english": "Yesterday I decided to learn Greek. And today I can already speak a little.",

@@ -18,6 +18,7 @@ PUBLIC_FILES = {
     "index.html", "style.css", "app.js", "world.js", "game-logic.js", "lessons.json",
     "character.js", "atmosphere.js", "visuals.css", "credits.html", "runtime.json",
     "assets/icon.svg", "assets/models/runner.glb", "audio/manifest.json",
+    "languages.json", "lessons-hi.json",
 }
 CACHE = {}
 SPEECH_LOCK = threading.Lock()
@@ -34,31 +35,50 @@ def load_env():
     if len(values) == 1 and re.fullmatch(r"[A-Za-z0-9_-]{20,}", values[0]):
         os.environ.setdefault("ELEVENLABS_API_KEY", values[0])
         return
-    allowed = {"ELEVENLABS_API_KEY", "ELEVENLABS_VOICE_ID", "ELEVENLABS_MODEL_ID"}
+    allowed = {"ELEVENLABS_API_KEY", "ELEVENLABS_VOICE_ID", "ELEVENLABS_HINDI_VOICE_ID", "ELEVENLABS_MODEL_ID"}
     for line in lines:
         key, sep, value = line.strip().partition("=")
         if sep and key.strip() in allowed:
             os.environ.setdefault(key.strip(), value.strip().strip("\"'"))
 
 
+def speech_items():
+    """Enumerate the built-in recordings, including grammatical-form variants."""
+    catalog = json.loads((ROOT / "languages.json").read_text(encoding="utf-8"))
+    items = {}
+    for language in catalog:
+        lessons = json.loads((ROOT / language["lesson"]).read_text(encoding="utf-8"))
+        for phrase in [*lessons["phrases"], lessons["story"]]:
+            variants = {"": phrase, **{f"-{form}": variant for form, variant in phrase.get("forms", {}).items()}}
+            for suffix, variant in variants.items():
+                phrase_id = phrase["id"] + suffix
+                if phrase_id in items:
+                    raise ValueError(f"Duplicate recording ID: {phrase_id}")
+                items[phrase_id] = {"id": phrase_id, "language": language["id"], "text": variant.get("native", variant.get("greek"))}
+    return items
+
+
 def speech_for(phrase_id):
-    lessons = json.loads((ROOT / "lessons.json").read_text(encoding="utf-8"))
-    phrases = {p["id"]: p["greek"] for p in [*lessons["phrases"], lessons["story"]]}
+    phrases = speech_items()
     if phrase_id not in phrases:
         return 400, {"error": "Unknown phrase."}
     key = os.environ.get("ELEVENLABS_API_KEY", "").strip()
     if not key:
         return 503, {"error": "ElevenLabs is not configured. Published recordings can still be played."}
-    voice = os.environ.get("ELEVENLABS_VOICE_ID") or "3NIJOdpOh5ailCXf4Qmi"
+    item = phrases[phrase_id]
+    if item["language"] == "hi":
+        voice = os.environ.get("ELEVENLABS_HINDI_VOICE_ID") or "9w95y5s4Oaw0nGMYD6AB"
+    else:
+        voice = os.environ.get("ELEVENLABS_VOICE_ID") or "3NIJOdpOh5ailCXf4Qmi"
     model = os.environ.get("ELEVENLABS_MODEL_ID") or "eleven_v3"
     if not re.fullmatch(r"[A-Za-z0-9_-]{1,100}", voice):
         return 503, {"error": "Check the configured ElevenLabs voice ID."}
-    cache_key = (phrase_id, voice, model)
+    cache_key = (phrase_id, item["text"], voice, model)
     with SPEECH_LOCK:
         if cache_key in CACHE:
             return 200, CACHE[cache_key]
         body = json.dumps({
-            "text": phrases[phrase_id], "model_id": model, "language_code": "el",
+            "text": item["text"], "model_id": model, "language_code": item["language"],
             "voice_settings": {"stability": 0.5, "similarity_boost": 0.75, "speed": 0.95},
         }).encode()
         request = Request(

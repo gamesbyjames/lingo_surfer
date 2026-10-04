@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "A sunlit 3D Greek-learning runner for GitHub Pages",
+  "description": "A sunlit 3D Greek and Hindi learning runner for GitHub Pages",
   "scripts": {
     "start": "python3 server.py",
     "build": "python3 scripts/build_site.py",

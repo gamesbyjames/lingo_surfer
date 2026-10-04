@@ -239,7 +239,7 @@ export class CoastWorld {
     }
     return t;
   }
-  spawnObstacle(lane, kind) {
+  spawnObstacle(lane, kind, z = -43) {
     const g = new THREE.Group();
     if (kind === 'barrier') {
       this.put(g, this.box(2.4, .75, .8, 0xc09b70), 0, .4, 0);
@@ -250,22 +250,23 @@ export class CoastWorld {
       this.put(g, this.box(2.6, .95, .5, colors.blue), 0, 2.25, 0);
       for (let i = 0; i < 5; i++) this.put(g, this.box(.25, .15, .52, colors.white), i * .48 - .96, 1.86, 0);
     }
-    g.position.set(lane * LANE_WIDTH, 0, -43);
+    g.position.set(lane * LANE_WIDTH, 0, z);
     this.scene.add(g);
     this.entities.push({ mesh: g, kind, lane, hit: false });
   }
-  spawnCoins(lane, raised = false) {
+  spawnCoins(lane, raised = false, z = -32) {
     for (let i = 0; i < 5; i++) {
       const material = this.mat(colors.gold);
       material.metalness = .6; material.roughness = .25; material.emissive.setHex(0xb27317); material.emissiveIntensity = .24;
       const coin = new THREE.Mesh(new THREE.TorusGeometry(.28, .08, 8, 16), material);
-      coin.position.set(lane * LANE_WIDTH, raised ? 2 : 1, -32 - i * 2.5);
+      coin.position.set(lane * LANE_WIDTH, raised ? 2 : 1, z - i * 2.5);
       this.scene.add(coin);
       this.entities.push({ mesh: coin, kind: 'coin', lane, hit: false });
     }
   }
   showGates(distance) {
     this.clearGates();
+    this.gateRushSpeed = 0;
     this.gates = new THREE.Group();
     for (let lane = -1; lane <= 1; lane++) {
       const g = new THREE.Group();
@@ -284,7 +285,15 @@ export class CoastWorld {
     this.gates.position.z = PLAYER_Z - distance;
     this.scene.add(this.gates);
   }
-  clearGates() { if (this.gates) { this.disposeGroup(this.gates); this.gates = null; } }
+  setGateRemaining(seconds, speed) {
+    if (this.gates) this.gates.position.z = PLAYER_Z - seconds * speed;
+  }
+  passGate() {
+    // Feedback is immediate; the arch sweeps past in 0.35s instead of making
+    // the learner wait for the original countdown to finish.
+    if (this.gates) this.gateRushSpeed = Math.max(20, (PLAYER_Z + 7 - this.gates.position.z) / .35);
+  }
+  clearGates() { if (this.gates) { this.disposeGroup(this.gates); this.gates = null; } this.gateRushSpeed = 0; }
   disposeGroup(group) {
     this.scene.remove(group);
     group.traverse(child => { if (child.geometry) child.geometry.dispose(); });
@@ -344,7 +353,10 @@ export class CoastWorld {
       }
       if (e.mesh.position.z > 20) { this.disposeGroup(e.mesh); this.entities.splice(i, 1); }
     }
-    if (this.gates) this.gates.position.z += travel;
+    if (this.gates) {
+      this.gates.position.z += this.gateRushSpeed ? this.gateRushSpeed * dt : travel;
+      if (this.gates.position.z > PLAYER_Z + 7) this.clearGates();
+    }
     return events;
   }
   render() { this.renderer.render(this.scene, this.camera); }

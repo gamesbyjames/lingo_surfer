@@ -8,7 +8,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from server import PUBLIC_FILES
+from server import PUBLIC_FILES, speech_items
 
 
 def build_site(output=ROOT / "_site"):
@@ -20,8 +20,7 @@ def build_site(output=ROOT / "_site"):
     output.mkdir(parents=True)
     files = set(PUBLIC_FILES)
     manifest = json.loads((ROOT / "audio/manifest.json").read_text())
-    lessons = json.loads((ROOT / "lessons.json").read_text())
-    valid_ids = {p["id"] for p in [*lessons["phrases"], lessons["story"]]}
+    valid_ids = set(speech_items())
     for phrase_id, filename in manifest.items():
         if phrase_id not in valid_ids or filename != f"audio/{phrase_id}.mp3":
             raise ValueError(f"Invalid recording entry: {phrase_id}")

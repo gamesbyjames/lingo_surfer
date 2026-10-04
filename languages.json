@@ -1,0 +1,4 @@
+[
+  {"id":"el","name":"Greek","flag":"🇬🇷","lesson":"lessons.json","description":"Your first little story, one phrase at a time."},
+  {"id":"hi","name":"Hindi","flag":"🇮🇳","lesson":"lessons-hi.json","description":"Your first story, useful phrases, and words of delight."}
+]

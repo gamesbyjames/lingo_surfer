@@ -52,3 +52,46 @@ export function safeProgress(raw, validIds) {
 export function obstacleHits(kind, jumpHeight, sliding) {
   return kind === 'barrier' ? jumpHeight < 1.05 : !sliding;
 }
+
+const PACES = [
+  { label: 'Relaxed', runSpeed: 10, gateSpeed: 7.5, study: 9, sentenceStudy: 12, gate: 10, sentenceGate: 14, correctFeedback: 2, wrongFeedback: 4, spawnInterval: 3.5 },
+  { label: 'Steady', runSpeed: 12, gateSpeed: 8, study: 7, sentenceStudy: 10, gate: 8, sentenceGate: 11, correctFeedback: 1.5, wrongFeedback: 3.5, spawnInterval: 3 },
+  { label: 'Brisk', runSpeed: 14, gateSpeed: 9, study: 5, sentenceStudy: 7, gate: 6, sentenceGate: 9, correctFeedback: 1, wrongFeedback: 3, spawnInterval: 2.4 },
+  { label: 'Fast', runSpeed: 17, gateSpeed: 10, study: 4, sentenceStudy: 6, gate: 5, sentenceGate: 7, correctFeedback: .9, wrongFeedback: 2.5, spawnInterval: 1.9 },
+  { label: 'Sprint', runSpeed: 20, gateSpeed: 11, study: 3, sentenceStudy: 5, gate: 4, sentenceGate: 6, correctFeedback: .75, wrongFeedback: 2, spawnInterval: 1.5 },
+];
+
+export function normalizePace(value) {
+  if (value === null || value === undefined || value === '') return 3;
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.min(5, Math.max(1, Math.round(number))) : 3;
+}
+
+export function getPacing(level, longPhrase = false) {
+  const pace = PACES[normalizePace(level) - 1];
+  return {
+    ...pace,
+    studyDuration: longPhrase ? pace.sentenceStudy : pace.study,
+    gateDuration: longPhrase ? pace.sentenceGate : pace.gate,
+  };
+}
+
+// Changing difficulty preserves progress through the current phase, including
+// while paused. It cannot reset a nearly completed question to a full timer.
+export function retimeRemaining(remaining, oldDuration, newDuration) {
+  if (oldDuration <= 0) return newDuration;
+  return Math.min(1, Math.max(0, remaining / oldDuration)) * newDuration;
+}
+
+export function resolveLesson(course, form = 'masculine') {
+  const resolve = item => {
+    const variant = item.forms?.[form];
+    return { ...item, ...variant, id: item.id, audioId: variant ? `${item.id}-${form}` : item.id };
+  };
+  return { ...course, story: resolve(course.story), phrases: course.phrases.map(resolve) };
+}
+
+export function progressKey(language) {
+  // Preserve existing Greek progress from before the language menu was added.
+  return language === 'el' ? 'little-odyssey-progress-v1' : `little-odyssey-progress-v1:${language}`;
+}

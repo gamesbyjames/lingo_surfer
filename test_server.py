@@ -49,7 +49,7 @@ class ServerTests(unittest.TestCase):
         return self.request("/api/speech", json.dumps(payload), {"Content-Type": "application/json", **headers})
 
     def test_static_assets_and_module_mime_types(self):
-        for path in ["/", "/style.css", "/app.js", "/world.js", "/character.js", "/atmosphere.js", "/game-logic.js", "/lessons.json", "/visuals.css", "/assets/models/runner.glb", "/assets/icon.svg"]:
+        for path in ["/", "/style.css", "/app.js", "/world.js", "/character.js", "/atmosphere.js", "/game-logic.js", "/lessons.json", "/lessons-hi.json", "/languages.json", "/visuals.css", "/assets/models/runner.glb", "/assets/icon.svg"]:
             with self.subTest(path=path):
                 status, content_type, body = self.request(path)
                 self.assertEqual(status, 200)
@@ -75,8 +75,7 @@ class ServerTests(unittest.TestCase):
         self.assertIsInstance(json.loads(data), dict)
 
     def test_all_lesson_recordings_are_served_as_mp3(self):
-        lessons = json.loads((server.ROOT / "lessons.json").read_text())
-        ids = {p["id"] for p in [*lessons["phrases"], lessons["story"]]}
+        ids = set(server.speech_items())
         manifest = json.loads((server.ROOT / "audio/manifest.json").read_text())
         self.assertEqual(set(manifest), ids)
         for phrase_id, path in manifest.items():
@@ -134,8 +133,39 @@ class ServerTests(unittest.TestCase):
         self.assertNotIn(b"secret-test-key", body)
         self.assertNotIn(b"private account", body)
 
+    @patch.dict(os.environ, {"ELEVENLABS_API_KEY": "secret-test-key", "ELEVENLABS_VOICE_ID": "greekvoice", "ELEVENLABS_HINDI_VOICE_ID": "hindivoice"})
+    @patch("server.urlopen")
+    def test_hindi_forms_use_hindi_text_voice_and_separate_cache_entries(self, urlopen):
+        upstream = MagicMock()
+        upstream.read.return_value = b"test-audio"
+        urlopen.return_value.__enter__.return_value = upstream
+        for phrase_id in ["hi-want-learn", "hi-want-learn-feminine", "hi-want-learn"]:
+            self.assertEqual(self.post({"id": phrase_id})[0], 200)
+        self.assertEqual(urlopen.call_count, 2)
+        first, second = [call.args[0] for call in urlopen.call_args_list]
+        self.assertIn("/hindivoice?", first.full_url)
+        self.assertEqual(json.loads(first.data)["language_code"], "hi")
+        self.assertEqual(json.loads(first.data)["text"], "मैं हिंदी सीखना चाहता हूँ।")
+        self.assertEqual(json.loads(second.data)["text"], "मैं हिंदी सीखना चाहती हूँ।")
+
 
 class LessonTests(unittest.TestCase):
+    def test_hindi_lesson_forms_and_unambiguous_praise_choices(self):
+        lesson = json.loads((server.ROOT / "lessons-hi.json").read_text())
+        self.assertEqual(len(lesson["phrases"]), 16)
+        praise = {p["roman"] for p in lesson["phrases"] if p["id"] in {"hi-fantastic", "hi-brilliant", "hi-amazing", "hi-awesome"}}
+        for phrase in lesson["phrases"]:
+            for variant in [phrase, *phrase.get("forms", {}).values()]:
+                self.assertTrue(variant["roman"].isascii())
+                self.assertTrue(any('\u0900' <= c <= '\u097f' for c in variant["native"]))
+                self.assertNotIn(variant["roman"], variant["distractors"])
+                self.assertEqual(len(set(variant["distractors"])), 2)
+                if phrase["roman"] in praise:
+                    self.assertFalse(praise.intersection(variant["distractors"]))
+        items = server.speech_items()
+        self.assertEqual(len(items), 30)
+        self.assertEqual(sum(item["language"] == "hi" for item in items.values()), 21)
+
     def test_roman_pronunciations_and_stress(self):
         data = json.loads((server.ROOT / "lessons.json").read_text())
         self.assertEqual(len(data["phrases"]), 8)
@@ -180,7 +210,7 @@ class DeploymentTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             output = build_site(Path(temp) / "site")
             self.assertEqual(json.loads((output / "runtime.json").read_text()), {"speechApi": False})
-            for required in ["index.html", "character.js", "assets/models/runner.glb", "audio/manifest.json", ".nojekyll"]:
+            for required in ["index.html", "character.js", "assets/models/runner.glb", "audio/manifest.json", "languages.json", "lessons-hi.json", "audio/hi-want-learn-feminine.mp3", ".nojekyll"]:
                 self.assertTrue((output / required).is_file(), required)
             for forbidden in [".env", ".env.example", "server.py", ".git", "scripts", ".github"]:
                 self.assertFalse((output / forbidden).exists(), forbidden)
