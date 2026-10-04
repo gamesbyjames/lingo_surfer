@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f6f4ed" />
+  <title>Lingo Surfer · A little Greek. A little further.</title>
+  <meta name="description" content="Run the sunlit Aegean coast and learn your first Greek story. A free 3D language-learning runner with Roman-letter pronunciation." />
+  <link rel="icon" type="image/svg+xml" href="./assets/icon.svg" />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="./visuals.css" />
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="Lingo Surfer home"><span class="brand-icon">ls<span>↗</span></span><span>lingo surfer<span class="brand-sub">LANGUAGE IN MOTION</span></span></a>
+      <nav aria-label="Main navigation"><span class="nav-active">Your journey</span><button id="phrasebook-button" class="nav-button">Phrasebook <span>↗</span></button></nav>
+      <span class="language-badge"><span class="flag">▤</span> GREEK <span class="badge-dot"></span> BEGINNER</span>
+    </header>
+
+    <main>
+      <section class="page-heading">
+        <div><div class="eyebrow"><span class="tiny-sun">✳</span> SMALL STEPS. REAL CONVERSATIONS.</div><h1>A little Greek. <span>A little further.</span></h1></div>
+        <p>No flashcard mountain to climb.<br>Just you, the coast, and your next sentence.</p>
+      </section>
+
+      <div class="journey-grid">
+        <aside class="lesson-column">
+          <section class="lesson-card">
+            <div class="card-kicker"><span>YOUR FIRST STORY</span><span>01 / 01</span></div>
+            <div class="lesson-icon">☀</div>
+            <h2>It starts with<br>a little courage.</h2>
+            <p class="story-english">“Yesterday I decided to learn Greek. And today I can already speak a little.”</p>
+            <div class="lesson-divider"></div>
+            <div class="card-kicker"><span id="phrase-label">FIRST, TRY SAYING</span><span id="phrase-number">01 / 08</span></div>
+            <h3 id="study-roman" class="roman">ehtEs</h3>
+            <p id="study-english" class="study-english">Yesterday</p>
+            <div class="listen-row"><button id="listen-button" class="listen-button"><span>◖))</span> Hear it in Greek</button><span id="audio-status" class="audio-status" aria-live="polite"></span></div>
+            <div class="stress-tip"><span>A</span><p>Capital vowels carry the emphasis.<br><strong>eh-TES</strong>, not EH-tes.</p></div>
+            <div id="lesson-progress" class="lesson-progress" aria-label="Lesson progress"></div>
+          </section>
+          <div class="gentle-note"><span>↗</span><p><strong>Progress, at your pace.</strong><br>We slow things down for every question.</p></div>
+        </aside>
+
+        <section class="game-card" aria-label="3D Greek learning runner">
+          <div id="game-viewport" tabindex="0" role="application" aria-label="Running game. Left and right arrows change lanes, up jumps, down slides. P pauses."></div>
+          <div class="scene-vignette"></div>
+          <div class="game-topbar">
+            <span class="location"><span class="location-dot"></span> THE AEGEAN TRAIL</span>
+            <div class="game-actions"><button id="fullscreen-button" class="icon-button" aria-label="Expand game" title="Expand game">⛶</button><button id="sound-button" class="icon-button" aria-label="Mute game sounds" title="Toggle game sounds">♫</button><button id="pause-button" class="icon-button" aria-label="Pause game" title="Pause (P)" disabled>Ⅱ</button></div>
+          </div>
+          <div id="hud" class="hud hidden"><div><span>DISTANCE</span><strong><span id="distance">0</span><small> m</small></strong></div><div><span>COINS</span><strong class="coin-stat">◈ <span id="coins">0</span></strong></div><div><span>HEARTS</span><strong id="hearts" class="hearts">♥ ♥ ♥</strong></div></div>
+
+          <div id="start-screen" class="start-screen">
+            <div class="trail-tag">A RUN WITH A LITTLE MORE MEANING</div>
+            <h2>Your Greek adventure<br>starts here.</h2>
+            <p>Chase the sunshine. Collect new words.</p>
+            <button id="start-button" class="primary-button" disabled>Preparing the coast… <span>↗</span></button>
+            <span class="start-caption">ONE STORY · EIGHT SMALL STEPS · YOUR OWN PACE</span>
+            <span id="character-status" class="character-status">LOADING YOUR RUNNER…</span>
+          </div>
+
+          <div id="question-panel" class="question-panel hidden">
+            <div class="question-eyebrow"><span id="question-kind">FIND THE GREEK</span><span id="gate-countdown">9s</span></div>
+            <h3 id="question-text"></h3><p>Steer into the matching lane · tap an answer to move</p>
+            <div class="question-timer"><div id="question-timer-fill"></div></div>
+          </div>
+          <div id="answer-options" class="answer-options hidden" aria-label="Answer lanes"></div>
+          <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+          <div id="run-hint" class="run-hint hidden">← → MOVE <span>↑ JUMP</span><span>↓ SLIDE</span></div>
+
+          <div id="pause-screen" class="game-modal hidden"><span class="eyebrow">TAKE A BREATH</span><h2>The coast can wait.</h2><p>Your next little step will be here.</p><button id="resume-button" class="primary-button">Keep going <span>→</span></button><button id="end-run-button" class="text-button">Finish this run</button></div>
+          <div id="end-screen" class="game-modal hidden"><span class="eyebrow">THAT’S A LITTLE FURTHER</span><h2 id="end-title">Look how far you came.</h2><p id="end-summary"></p><div id="end-stats" class="end-stats"></div><div id="end-review" class="end-review"></div><button id="restart-button" class="primary-button">Another little odyssey <span>↗</span></button></div>
+          <div id="load-error" class="game-modal hidden"><h2>A little detour.</h2><p id="load-error-message">The 3D scene couldn’t load. Check your internet connection and refresh.</p><button class="primary-button" onclick="location.reload()">Try again ↗</button></div>
+          <div class="scene-caption"><span>37° 44′ N &nbsp; 25° 16′ E</span><span>A NEW WAY TO FIND YOUR WORDS</span></div>
+        </section>
+      </div>
+
+      <section class="bottom-strip" aria-label="Progress and controls">
+        <div class="progress-summary"><span class="stat-icon">⚑</span><div><strong id="best-distance">0 m</strong><span>YOUR FURTHEST RUN</span></div></div>
+        <div class="progress-summary"><span class="stat-icon">✧</span><div><strong><span id="learned-count">0</span> / 8 phrases</strong><span>PRACTICED CORRECTLY</span></div></div>
+        <div class="controls-summary"><div><kbd>←</kbd><kbd>→</kbd><span>move</span><kbd>↑</kbd><span>jump</span><kbd>↓</kbd><span>slide</span></div><p>On your phone? Swipe to explore. Tap an answer to choose.</p></div>
+      </section>
+    </main>
+    <footer><span>A little practice goes a long way. <a href="./credits.html">Credits</a></span><span>MADE FOR THE JOY OF GETTING THERE <span class="footer-sun">✳</span></span></footer>
+  </div>
+
+  <dialog id="phrasebook"><div class="dialog-heading"><div><div class="eyebrow">YOUR POCKET COMPANION</div><h2>The first little story.</h2></div><button id="close-phrasebook" class="close-button" aria-label="Close phrasebook">×</button></div><p class="dialog-intro">Greek in Roman letters. Say the capital vowels with emphasis. <strong>th</strong> sounds like “think”; <strong>dh</strong> like “this”; <strong>eh</strong> like the vowel in “bed”; <strong>h</strong> is a breathy sound, like the “ch” in Scottish “loch”.</p><div id="phrasebook-list"></div><div class="whole-story"><span>PUT IT ALL TOGETHER</span><p>ehtEs apofAsisa na mAtho ellinikA.<br>Ke sImera borO Idhi na milAo lIgo.</p><button id="story-listen" class="listen-button">◖)) Hear the whole story</button></div></dialog>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

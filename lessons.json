@@ -1,0 +1,18 @@
+{
+  "story": {
+    "id": "story",
+    "english": "Yesterday I decided to learn Greek. And today I can already speak a little.",
+    "roman": "ehtEs apofAsisa na mAtho ellinikA. Ke sImera borO Idhi na milAo lIgo.",
+    "greek": "Εχτές αποφάσισα να μάθω ελληνικά. Και σήμερα μπορώ ήδη να μιλάω λίγο."
+  },
+  "phrases": [
+    {"id":"yesterday","english":"Yesterday","roman":"ehtEs","greek":"Εχτές","distractors":["sImera","lIgo"]},
+    {"id":"decided","english":"I decided","roman":"apofAsisa","greek":"αποφάσισα","distractors":["borO","milAo"]},
+    {"id":"learn","english":"to learn Greek","roman":"na mAtho ellinikA","greek":"να μάθω ελληνικά","distractors":["na milAo lIgo","na mAtho gallikA"]},
+    {"id":"first-sentence","english":"Yesterday I decided to learn Greek.","roman":"ehtEs apofAsisa na mAtho ellinikA.","greek":"Εχτές αποφάσισα να μάθω ελληνικά.","distractors":["sImera apofAsisa na mAtho ellinikA.","ehtEs apofAsisa na mAtho gallikA."]},
+    {"id":"today","english":"And today","roman":"Ke sImera","greek":"Και σήμερα","distractors":["Ke ehtEs","Ke Avrio"]},
+    {"id":"already","english":"I can already","roman":"borO Idhi","greek":"μπορώ ήδη","distractors":["borO Avrio","apofAsisa Idhi"]},
+    {"id":"speak","english":"speak a little","roman":"na milAo lIgo","greek":"να μιλάω λίγο","distractors":["na milAo polI","na mAtho ellinikA"]},
+    {"id":"second-sentence","english":"And today I can already speak a little.","roman":"Ke sImera borO Idhi na milAo lIgo.","greek":"Και σήμερα μπορώ ήδη να μιλάω λίγο.","distractors":["Ke ehtEs borO Idhi na milAo lIgo.","Ke sImera borO Idhi na milAo polI."]}
+  ]
+}
