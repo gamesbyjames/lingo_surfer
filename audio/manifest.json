@@ -1,1 +1,11 @@
-{}
+{
+  "yesterday": "audio/yesterday.mp3",
+  "decided": "audio/decided.mp3",
+  "learn": "audio/learn.mp3",
+  "first-sentence": "audio/first-sentence.mp3",
+  "today": "audio/today.mp3",
+  "already": "audio/already.mp3",
+  "speak": "audio/speak.mp3",
+  "second-sentence": "audio/second-sentence.mp3",
+  "story": "audio/story.mp3"
+}

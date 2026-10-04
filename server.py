@@ -28,8 +28,14 @@ def load_env():
     env_file = ROOT / ".env"
     if not env_file.is_file():
         return
+    lines = env_file.read_text(encoding="utf-8-sig").splitlines()
+    values = [line.strip() for line in lines if line.strip() and not line.lstrip().startswith("#")]
+    # Also accept a key pasted on its own in this private local file. Never log it.
+    if len(values) == 1 and re.fullmatch(r"[A-Za-z0-9_-]{20,}", values[0]):
+        os.environ.setdefault("ELEVENLABS_API_KEY", values[0])
+        return
     allowed = {"ELEVENLABS_API_KEY", "ELEVENLABS_VOICE_ID", "ELEVENLABS_MODEL_ID"}
-    for line in env_file.read_text(encoding="utf-8").splitlines():
+    for line in lines:
         key, sep, value = line.strip().partition("=")
         if sep and key.strip() in allowed:
             os.environ.setdefault(key.strip(), value.strip().strip("\"'"))
@@ -42,8 +48,8 @@ def speech_for(phrase_id):
         return 400, {"error": "Unknown phrase."}
     key = os.environ.get("ELEVENLABS_API_KEY", "").strip()
     if not key:
-        return 503, {"error": "ElevenLabs is not configured. Device speech is still available."}
-    voice = os.environ.get("ELEVENLABS_VOICE_ID") or "JBFqnCBsd6RMkjVDRZzb"
+        return 503, {"error": "ElevenLabs is not configured. Published recordings can still be played."}
+    voice = os.environ.get("ELEVENLABS_VOICE_ID") or "3NIJOdpOh5ailCXf4Qmi"
     model = os.environ.get("ELEVENLABS_MODEL_ID") or "eleven_v3"
     if not re.fullmatch(r"[A-Za-z0-9_-]{1,100}", voice):
         return 503, {"error": "Check the configured ElevenLabs voice ID."}
@@ -51,7 +57,10 @@ def speech_for(phrase_id):
     with SPEECH_LOCK:
         if cache_key in CACHE:
             return 200, CACHE[cache_key]
-        body = json.dumps({"text": phrases[phrase_id], "model_id": model, "language_code": "el"}).encode()
+        body = json.dumps({
+            "text": phrases[phrase_id], "model_id": model, "language_code": "el",
+            "voice_settings": {"stability": 0.5, "similarity_boost": 0.75, "speed": 0.95},
+        }).encode()
         request = Request(
             f"https://api.elevenlabs.io/v1/text-to-speech/{voice}?output_format=mp3_44100_128",
             data=body,

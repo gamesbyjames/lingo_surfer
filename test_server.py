@@ -69,10 +69,22 @@ class ServerTests(unittest.TestCase):
     def test_local_runtime_enables_only_the_local_speech_api(self):
         self.assertEqual(json.loads(self.request("/runtime.json")[2]), {"speechApi": True})
 
-    def test_empty_recordings_manifest_is_valid(self):
+    def test_recordings_manifest_is_valid(self):
         status, _, data = self.request("/audio/manifest.json")
         self.assertEqual(status, 200)
         self.assertIsInstance(json.loads(data), dict)
+
+    def test_all_lesson_recordings_are_served_as_mp3(self):
+        lessons = json.loads((server.ROOT / "lessons.json").read_text())
+        ids = {p["id"] for p in [*lessons["phrases"], lessons["story"]]}
+        manifest = json.loads((server.ROOT / "audio/manifest.json").read_text())
+        self.assertEqual(set(manifest), ids)
+        for phrase_id, path in manifest.items():
+            with self.subTest(phrase=phrase_id):
+                status, content_type, audio = self.request('/' + path)
+                self.assertEqual(status, 200)
+                self.assertEqual(content_type, "audio/mpeg")
+                self.assertGreater(len(audio), 3000)
 
     @patch.dict(os.environ, {"ELEVENLABS_API_KEY": ""})
     def test_no_key_mode(self):
@@ -111,6 +123,7 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(payload["text"], "Εχτές")
         self.assertEqual(payload["language_code"], "el")
         self.assertEqual(payload["model_id"], "eleven_v3")
+        self.assertEqual(payload["voice_settings"]["speed"], 0.95)
         self.assertEqual(request.get_header("Xi-api-key"), "secret-test-key")
 
     @patch.dict(os.environ, {"ELEVENLABS_API_KEY": "secret-test-key"})
@@ -138,6 +151,28 @@ class LessonTests(unittest.TestCase):
             roman_stresses = sum(c in "AEIOU" for c in phrase["roman"])
             self.assertEqual(greek_stresses, roman_stresses, phrase["id"])
         self.assertTrue(data["story"]["roman"].startswith("ehtEs"))
+
+
+class EnvironmentTests(unittest.TestCase):
+    @patch.dict(os.environ, {}, clear=True)
+    def test_key_pasted_alone_in_private_env_file(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / ".env").write_text("# My local speech key\nsk_example_not_a_real_key_12345\n")
+            with patch.object(server, "ROOT", root):
+                server.load_env()
+            self.assertEqual(os.environ["ELEVENLABS_API_KEY"], "sk_example_not_a_real_key_12345")
+
+    @patch.dict(os.environ, {"ELEVENLABS_API_KEY": "existing-value"}, clear=True)
+    def test_env_file_does_not_override_existing_configuration(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / ".env").write_text('\ufeffELEVENLABS_API_KEY="local-value"\nELEVENLABS_VOICE_ID=myvoice\nUNRELATED=ignored\n')
+            with patch.object(server, "ROOT", root):
+                server.load_env()
+            self.assertEqual(os.environ["ELEVENLABS_API_KEY"], "existing-value")
+            self.assertEqual(os.environ["ELEVENLABS_VOICE_ID"], "myvoice")
+            self.assertNotIn("UNRELATED", os.environ)
 
 
 class DeploymentTests(unittest.TestCase):

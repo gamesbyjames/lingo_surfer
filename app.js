@@ -31,7 +31,6 @@ function stopVoice() {
   voiceRequest?.abort();
   voiceRequest = null;
   if (currentAudio) { currentAudio.pause(); currentAudio = null; }
-  window.speechSynthesis?.cancel();
   $('audio-status').textContent = '';
 }
 
@@ -44,7 +43,7 @@ async function speak(item, explicit = false) {
       currentAudio = new Audio(new URL(recordings[item.id], document.baseURI).href);
       currentAudio.onended = () => { if (generation === speechGeneration) $('audio-status').textContent = ''; };
       await currentAudio.play();
-      if (generation === speechGeneration) $('audio-status').textContent = 'Greek recording';
+      if (generation === speechGeneration) $('audio-status').textContent = 'ElevenLabs · Greek';
       return;
     } catch {
       if (generation !== speechGeneration) return;
@@ -66,30 +65,19 @@ async function speak(item, explicit = false) {
       }
       if (generation !== speechGeneration) return;
       currentAudio = new Audio(audioCache.get(item.id));
-      currentAudio.onended = () => { $('audio-status').textContent = ''; };
+      currentAudio.onended = () => { if (generation === speechGeneration) $('audio-status').textContent = ''; };
       await currentAudio.play();
       if (generation === speechGeneration) $('audio-status').textContent = 'ElevenLabs';
       return;
     } catch {
       if (generation !== speechGeneration) return;
-      $('audio-status').textContent = 'Trying device audio…';
     }
   }
-  if (!window.speechSynthesis) {
-    $('audio-status').textContent = 'Audio unavailable on this device';
-    return;
+  // Never silently replace a native-Greek recording with a device's synthetic
+  // voice: its accent and quality vary dramatically across browsers.
+  if (generation === speechGeneration) {
+    $('audio-status').textContent = explicit ? 'Recording unavailable. Please try again.' : 'Tap Hear it in Greek to play audio';
   }
-  const voice = window.speechSynthesis.getVoices().find(v => v.lang.toLowerCase().startsWith('el'));
-  if (!voice) {
-    $('audio-status').textContent = explicit ? 'A Greek device voice or recording is needed' : '';
-    return;
-  }
-  const speech = new SpeechSynthesisUtterance(item.greek);
-  speech.lang = 'el-GR'; speech.voice = voice; speech.rate = .82;
-  speech.onend = () => { if (generation === speechGeneration) $('audio-status').textContent = ''; };
-  speech.onerror = () => { if (generation === speechGeneration) $('audio-status').textContent = 'Tap to try audio again'; };
-  window.speechSynthesis.speak(speech);
-  $('audio-status').textContent = 'Device voice';
 }
 
 function unlockSound() {
@@ -403,7 +391,6 @@ async function init() {
         if (response.ok) voiceAvailable = (await response.json()).elevenlabs === true;
       }).catch(() => {}),
     ]);
-    window.speechSynthesis?.getVoices();
     const { CoastWorld } = await import('./world.js');
     world = new CoastWorld($('game-viewport'));
     world.render();

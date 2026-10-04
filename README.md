@@ -66,13 +66,14 @@ The phrasebook lets you read and listen without running. Your best distance and 
 1. Copy `.env.example` to a file named `.env` in this folder.
 2. Put your API key after `ELEVENLABS_API_KEY=` in `.env`.
 3. Optionally replace `ELEVENLABS_VOICE_ID` with a voice from your account.
-4. Restart `python3 server.py` and refresh the page.
+4. Add **Stavros — Native Greek, Warm & playful** (`3NIJOdpOh5ailCXf4Qmi`) to your ElevenLabs voice library if using the default voice.
+5. Restart `python3 server.py` and refresh the page.
 
-The default model is `eleven_v3`, which supports Greek. The original Greek text is sent for speech, not the Roman pronunciation guide. The server accepts only the built-in phrase IDs, keeps the key private, and caches generated audio in memory for the server session. The `.env` file is excluded from Git and cannot be downloaded through the local server. Environment variables can be used instead of `.env`.
+The default model is `eleven_v3`, using a native Greek voice at a gently reduced generation speed. The original Greek text is sent for speech, not the Roman pronunciation guide. The server accepts only the built-in phrase IDs, keeps the key private, and caches generated audio in memory for the server session. The `.env` file is excluded from Git and cannot be downloaded through the local server. Environment variables can be used instead of `.env`; a key pasted by itself into `.env` is also accepted.
 
 ### ElevenLabs on GitHub Pages
 
-Pages cannot run a private speech proxy. Generate recordings locally, then publish only the MP3s:
+The site includes **nine pre-generated ElevenLabs Greek recordings**, so visitors get consistent pronunciation without a key or a Greek device voice. Pages cannot run a private speech proxy. To regenerate recordings locally, then publish only the MP3s:
 
 ```bash
 python3 scripts/generate_audio.py
@@ -81,7 +82,7 @@ python3 scripts/build_site.py
 
 The first command uses your local `.env` key to generate the nine built-in phrases/story recordings in `audio/` and updates `audio/manifest.json`. It reuses existing MP3s to avoid repeated API charges. Commit those audio files and the manifest with the next deployment. The API key is never included in the website. To regenerate a phrase after editing it, remove its MP3 before running the generator again.
 
-The player tries published recordings first, then the local speech API when running `server.py`, then a Greek voice installed on the device. If no Greek audio is available, the text-based game remains playable and the listen button explains what is needed. The music-note button toggles automatic phrase audio and game sound effects; an explicit listen-button click still plays the selected phrase.
+The player tries published recordings first, then the local speech API when running `server.py`. It never falls back to browser speech synthesis: those voices vary too much in quality and accent. If a recording cannot play, a short retry message is shown. The music-note button toggles automatic phrase audio and game sound effects; an explicit listen-button click still plays the selected phrase. Recording details are in `audio/README.md`.
 
 ## Mixamo character
 
